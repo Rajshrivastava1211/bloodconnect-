@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+dist/
+build/
+
+*.log
+
+server/data/*.db
+server/data/*.sqlite
+server/data/*.sqlite3

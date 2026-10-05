@@ -1,0 +1,40 @@
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const { body, validationResult } = require('express-validator');
+const { register, login, getMe, registerOrganizer } = require('../controllers/authController');
+const { authenticateToken } = require('../middleware/auth');
+
+const router = express.Router();
+
+const isDev = process.env.NODE_ENV !== 'production';
+const authLimiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || 60000),
+  max: isDev ? 1000 : parseInt(process.env.AUTH_RATE_LIMIT_MAX || 20),
+  message: { success: false, message: 'Too many login attempts. Please wait a moment.' }
+});
+
+const registerValidation = [
+  body('name').trim().notEmpty().withMessage('Name is required.'),
+  body('email').isEmail().withMessage('Valid email is required.').normalizeEmail(),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters.')
+];
+
+const loginValidation = [
+  body('email').isEmail().withMessage('Valid email is required.').normalizeEmail(),
+  body('password').notEmpty().withMessage('Password is required.')
+];
+
+function validate(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: errors.array()[0].msg, errors: errors.array() });
+  }
+  next();
+}
+
+router.post('/register', authLimiter, registerValidation, validate, register);
+router.post('/register-organizer', authLimiter, registerValidation, validate, registerOrganizer);
+router.post('/login', authLimiter, loginValidation, validate, login);
+router.get('/me', authenticateToken, getMe);
+
+module.exports = router;
