@@ -57,7 +57,7 @@ const LoginPage = () => {
           <h2 className="text-2xl font-extrabold text-slate-900">Sign In to BloodConnect</h2>
           <p className="text-xs text-slate-500">
             Don't have an account?{' '}
-            <Link to="/register" className="font-bold text-red-600 hover:underline">Register as Donor</Link>
+            <Link to="/register" className="font-bold text-red-600 hover:underline">Register as Donor/Organizer</Link>
           </p>
         </div>
 

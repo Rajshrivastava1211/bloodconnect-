@@ -50,22 +50,37 @@ const RegisterPage = () => {
   };
 
   const handleOrganizerSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    if (organizerData.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
-    setLoading(true);
-    try {
-      const res = await api.post('/auth/register-organizer', organizerData);
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        window.location.href = '/organizer/dashboard';
+  e.preventDefault();
+  setError('');
+
+  if (organizerData.password.length < 6) {
+    setError('Password must be at least 6 characters.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const res = await api.post('/auth/register-organizer', organizerData);
+
+    // api.js already returns response.data
+    if (res.token) {
+      localStorage.setItem('token', res.token);
+
+      if (res.user) {
+        localStorage.setItem('user', JSON.stringify(res.user));
       }
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Registration failed.');
-    } finally {
-      setLoading(false);
+
+      window.location.href = '/organizer/dashboard';
+    } else {
+      setError(res.message || 'Registration failed.');
     }
-  };
+  } catch (err) {
+    setError(err.message || 'Registration failed.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const inputClass = (color = 'red') =>
     `w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-${color}-400 outline-none`;
