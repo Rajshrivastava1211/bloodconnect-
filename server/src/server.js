@@ -10,8 +10,8 @@ async function startServer() {
     await initDb();
     console.log('[Server] Database ready.');
 
-    app.listen(PORT, () => {
-      console.log(`[Server] BloodConnect API running on http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`[Server] BloodConnect API running on port ${PORT}`);
       console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (err) {
