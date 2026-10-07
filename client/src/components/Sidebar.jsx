@@ -1,13 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  FaTachometerAlt, FaUser, FaClipboardCheck, FaHistory, FaAward, 
-  FaBell, FaPlusCircle, FaCampground, FaUsers, FaChartLine, 
-  FaHospital, FaQuestionCircle, FaComment, FaFileAlt
+import {
+  FaTachometerAlt,
+  FaUser,
+  FaClipboardCheck,
+  FaHistory,
+  FaBell,
+  FaPlusCircle,
+  FaCampground,
+  FaUsers,
+  FaChartLine,
+  FaHospital,
+  FaQuestionCircle,
+  FaComment,
+  FaBars,
+  FaTimes
 } from 'react-icons/fa';
 
 const Sidebar = ({ role }) => {
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const isActive = (path) => location.pathname === path;
 
   const donorLinks = [
@@ -37,36 +50,130 @@ const Sidebar = ({ role }) => {
     { path: '/admin/reports', label: 'Reports & Analytics', icon: FaChartLine },
   ];
 
-  const links = role === 'admin' ? adminLinks : role === 'organizer' ? organizerLinks : donorLinks;
+  const links =
+    role === 'admin'
+      ? adminLinks
+      : role === 'organizer'
+        ? organizerLinks
+        : donorLinks;
+
+  const handleLinkClick = () => {
+    setMobileOpen(false);
+  };
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 min-h-[calc(100vh-4rem)] p-4 shrink-0 hidden md:block">
-      <div className="mb-6 px-3 py-2 bg-red-50 rounded-lg border border-red-100">
-        <p className="text-xs font-semibold text-red-700 uppercase tracking-wider">Logged in as</p>
-        <p className="text-sm font-bold text-slate-800 capitalize">{role} Portal</p>
-      </div>
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        type="button"
+        onClick={() => setMobileOpen(true)}
+        className="md:hidden fixed top-20 left-4 z-40 flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700"
+        aria-label="Open navigation menu"
+      >
+        <FaBars />
+        <span className="text-sm font-semibold">Menu</span>
+      </button>
 
-      <nav className="space-y-1">
-        {links.map((link) => {
-          const Icon = link.icon;
-          const active = isActive(link.path);
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                active 
-                  ? 'bg-red-600 text-white shadow-sm font-semibold' 
-                  : 'text-slate-600 hover:text-red-600 hover:bg-slate-50'
-              }`}
-            >
-              <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-400'}`} />
-              <span>{link.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-40"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <aside
+        className={`md:hidden fixed top-0 left-0 z-50 h-full w-72 bg-white shadow-xl transform transition-transform duration-300 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+          <div>
+            <p className="text-xs font-semibold text-red-700 uppercase tracking-wider">
+              Logged in as
+            </p>
+            <p className="text-sm font-bold text-slate-800 capitalize">
+              {role} Portal
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileOpen(false)}
+            className="p-2 text-slate-500 hover:text-red-600"
+            aria-label="Close navigation menu"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        <nav className="p-4 space-y-1 overflow-y-auto h-[calc(100%-80px)]">
+          {links.map((link) => {
+            const Icon = link.icon;
+            const active = isActive(link.path);
+
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={handleLinkClick}
+                className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  active
+                    ? 'bg-red-600 text-white shadow-sm font-semibold'
+                    : 'text-slate-600 hover:text-red-600 hover:bg-slate-50'
+                }`}
+              >
+                <Icon
+                  className={`w-4 h-4 ${
+                    active ? 'text-white' : 'text-slate-400'
+                  }`}
+                />
+                <span>{link.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Desktop Sidebar */}
+      <aside className="w-64 bg-white border-r border-slate-200 min-h-[calc(100vh-4rem)] p-4 shrink-0 hidden md:block">
+        <div className="mb-6 px-3 py-2 bg-red-50 rounded-lg border border-red-100">
+          <p className="text-xs font-semibold text-red-700 uppercase tracking-wider">
+            Logged in as
+          </p>
+          <p className="text-sm font-bold text-slate-800 capitalize">
+            {role} Portal
+          </p>
+        </div>
+
+        <nav className="space-y-1">
+          {links.map((link) => {
+            const Icon = link.icon;
+            const active = isActive(link.path);
+
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  active
+                    ? 'bg-red-600 text-white shadow-sm font-semibold'
+                    : 'text-slate-600 hover:text-red-600 hover:bg-slate-50'
+                }`}
+              >
+                <Icon
+                  className={`w-4 h-4 ${
+                    active ? 'text-white' : 'text-slate-400'
+                  }`}
+                />
+                <span>{link.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 };
 
