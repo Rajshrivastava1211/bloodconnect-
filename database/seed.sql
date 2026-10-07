@@ -8,7 +8,7 @@ PRAGMA foreign_keys = ON;
 -- USERS (Core accounts for testing & viva evaluation)
 -- ============================================================
 INSERT OR IGNORE INTO users (id, name, email, password_hash, role, is_active) VALUES
-  (1, 'Admin BloodConnect',    'admin@bloodconnect.org font-bold',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVyQSz7LH5', 'admin',     1),
+  (1, 'Admin BloodConnect',    'admin@bloodconnect.org',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVyQSz7LH5', 'admin',     1),
   (2, 'Red Cross Organizer',   'organizer1@bloodconnect.org',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVyQSz7LH5', 'organizer', 1),
   (3, 'Raj Shrivastava',       'donor1@bloodconnect.org',           '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVyQSz7LH5', 'donor',     1);
 
