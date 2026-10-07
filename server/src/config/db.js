@@ -35,22 +35,27 @@ function ensureDemoAccounts() {
   const demoPasswordHash = bcrypt.hashSync('BloodConnect@123', 10);
 
   const demoAccounts = [
-    {
-      name: 'Admin BloodConnect',
-      email: 'admin@bloodconnect.com',
-      role: 'admin'
-    },
-    {
-      name: 'Red Cross Organizer',
-      email: 'organizer@bloodconnect.com',
-      role: 'organizer'
-    },
-    {
-      name: 'Raj Shrivastava',
-      email: 'donor@bloodconnect.com',
-      role: 'donor'
-    }
-  ];
+  {
+    name: 'Admin BloodConnect',
+    email: 'admin@bloodconnect.com',
+    role: 'admin'
+  },
+  {
+    name: 'Raj Admin',
+    email: 'raj.admin@bloodconnect.com',
+    role: 'admin'
+  },
+  {
+    name: 'Red Cross Organizer',
+    email: 'organizer@bloodconnect.com',
+    role: 'organizer'
+  },
+  {
+    name: 'Raj Shrivastava',
+    email: 'donor@bloodconnect.com',
+    role: 'donor'
+  }
+];
 
   for (const account of demoAccounts) {
     const existing = db.exec(
@@ -177,44 +182,6 @@ async function initDb() {
   // ALWAYS ENSURE .COM DEMO ACCOUNTS
   // ==========================================
   ensureDemoAccounts();
-  // ==========================================
-  // PERSONAL ADMIN ACCOUNT
-  // Password hash comes from Render environment variable.
-  // Never store the actual password in source code.
-  // ==========================================
-  function ensurePersonalAdmin() {
-    const passwordHash = process.env.PERSONAL_ADMIN_PASSWORD_HASH;
-
-    if (!passwordHash) {
-      console.log('[DB] Personal admin setup skipped: password hash not configured.');
-      return;
-    }
-
-    const email = 'raj.admin@bloodconnect.com';
-
-    const existing = getDbWrapper().query(
-      'SELECT id FROM users WHERE email = ?',
-      [email]
-    );
-
-    if (existing.length > 0) {
-      getDbWrapper().run(
-        'UPDATE users SET name = ?, password_hash = ?, role = ?, is_active = 1 WHERE email = ?',
-        ['Raj Admin', passwordHash, 'admin', email]
-      );
-
-      console.log('[DB] Personal admin account ready:', email);
-    } else {
-      getDbWrapper().run(
-        'INSERT INTO users (name, email, password_hash, role, is_active) VALUES (?, ?, ?, ?, 1)',
-        ['Raj Admin', email, passwordHash, 'admin']
-      );
-
-      console.log('[DB] Personal admin account created:', email);
-    }
-  }
-
-  ensurePersonalAdmin();
 
   // Persist in-memory SQLite database every 30 seconds
   const persistInterval = setInterval(
@@ -304,6 +271,7 @@ function getDbWrapper() {
     exec(sql) {
       try {
         db.exec(sql);
+
 
         persistDb();
       } catch (err) {
