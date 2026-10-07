@@ -71,7 +71,7 @@ const RegisterPage = () => {
         localStorage.setItem('user', JSON.stringify(res.user));
       }
 
-      window.location.href = '/organizer/dashboard';
+      navigate('/organizer/dashboard');
     } else {
       setError(res.message || 'Registration failed.');
     }
