@@ -20,10 +20,7 @@ const Footer = () => {
             <p className="text-xs text-slate-400 leading-relaxed">
               A centralized blood donation camp discovery, donor pre-screening, and record management platform.
             </p>
-            <p className="text-xs text-slate-500 font-mono">
-              CEP Semester 5 Project (2026–27)<br />
-              BSc IT — Roll No. 61 & 122
-            </p>
+            
           </div>
 
           {/* Quick Links */}
