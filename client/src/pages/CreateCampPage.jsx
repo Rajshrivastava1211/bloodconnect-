@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Sidebar from '../components/Sidebar';
 import { FaCalendarPlus, FaSave, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 
+
+const getTodayDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const getCampStatus = (date) => {
+  if (!date) return '';
+  return date === getTodayDate() ? 'open' : 'upcoming';
+};
+
 const CreateCampPage = () => {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -24,9 +39,17 @@ const CreateCampPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData((previous) => ({
+    ...previous,
+    [name]: value,
+    ...(name === 'date' ? { status: getCampStatus(value) } : {})
+  }));
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +58,22 @@ const CreateCampPage = () => {
     setSaving(true);
 
     try {
-      await api.post('/camps', formData);
+
+const today = getTodayDate();
+
+if (!formData.date || formData.date < today) {
+  setError('Please select today or a future donation date.');
+  setSaving(false);
+  return;
+}
+
+const campData = {
+  ...formData,
+  status: getCampStatus(formData.date)
+};
+
+await api.post('/camps', campData);
+
       setSuccess(true);
       setTimeout(() => navigate('/organizer/manage-camps'), 1500);
     } catch (err) {
@@ -92,6 +130,9 @@ const CreateCampPage = () => {
                   type="date"
                   name="date"
                   required
+
+                  min={getTodayDate()}
+
                   value={formData.date}
                   onChange={handleChange}
                   className="w-full mt-1 border border-slate-300 rounded-lg p-2.5 text-sm bg-white"
@@ -165,23 +206,31 @@ const CreateCampPage = () => {
                 />
               </div>
 
+
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">Initial Status</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full mt-1 border border-slate-300 rounded-lg p-2 text-sm bg-white"
+                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  Initial Status (Automatic)
+                </label>
+                <div
+                  className="w-full mt-1 border border-slate-300 rounded-lg p-2.5 text-sm bg-slate-100 text-slate-700"
+                  aria-live="polite"
                 >
-                  <option value="draft">Draft</option>
-                  <option value="upcoming">Upcoming</option>
-                  <option value="open">Open (Accepting Registrations)</option>
-                </select>
+                  {!formData.date
+                    ? 'Select a donation date'
+                    : formData.status === 'open'
+                      ? 'Open (Accepting Registrations)'
+                      : 'Upcoming'}
+                </div>
+
+                <p className="text-xs text-slate-500 mt-1">
+                  Status is automatically determined by the donation date.
+                </p>
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase">Address details</label>
+
               <input
                 type="text"
                 name="address"

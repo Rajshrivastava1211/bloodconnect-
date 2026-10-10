@@ -1,5 +1,30 @@
 const { getDbWrapper } = require('../config/db');
 
+function getTodayDateIndia() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+}
+
+function isValidCampDate(date) {
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return false;
+  }
+
+  const parsed = new Date(`${date}T00:00:00.000Z`);
+
+  return !Number.isNaN(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === date;
+}
+
+function getAutomaticCampStatus(date) {
+  return date === getTodayDateIndia() ? 'open' : 'upcoming';
+}
+
+
 /** GET /api/camps — list with filters: city, status, date */
 function getCamps(req, res) {
   const db = getDbWrapper();
@@ -47,11 +72,43 @@ function createCamp(req, res) {
   try {
     const db = getDbWrapper();
     const { name, description, date, start_time, end_time, venue, address, city, capacity, status, image_url } = req.body;
+    
+if (!isValidCampDate(date)) {
+  return res.status(400).json({
+    success: false,
+    message: 'Please provide a valid donation date in YYYY-MM-DD format.'
+  });
+}
+
+if (date < getTodayDateIndia()) {
+  return res.status(400).json({
+    success: false,
+    message: 'Past donation dates are not allowed.'
+  });
+}
+
+const automaticStatus = getAutomaticCampStatus(date);
+
 
     const result = db.run(`
       INSERT INTO camps (organizer_id, name, description, date, start_time, end_time, venue, address, city, capacity, status, image_url)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [req.user.id, name, description || null, date, start_time, end_time, venue, address || null, city, capacity || 50, status || 'upcoming', image_url || null]);
+    `, 
+[
+  req.user.id,
+  name,
+  description || null,
+  date,
+  start_time,
+  end_time,
+  venue,
+  address || null,
+  city,
+  capacity || 50,
+  automaticStatus,
+  image_url || null
+]
+);
 
     const camp = db.query('SELECT * FROM camps WHERE id = ?', [result.lastInsertRowid])[0];
     return res.status(201).json({ success: true, message: 'Camp created successfully.', camp });
