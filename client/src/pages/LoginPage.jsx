@@ -48,12 +48,7 @@ const LoginPage = () => {
     }
   };
 
-  const fillDemo = (email, password) => {
-    setEmail(email);
-    setPassword(password);
-  };
-
-  return (
+    return (
     <div className="min-h-[calc(100vh-4rem-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50">
       <div className="max-w-md w-full space-y-6 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
 
@@ -146,68 +141,7 @@ const LoginPage = () => {
 
         </form>
 
-        {/* DEMO CREDENTIALS */}
-        <div className="pt-4 border-t border-slate-100 space-y-2 text-xs">
-
-          <p className="font-bold text-slate-700">
-            Quick Demo Logins (Click to autofill):
-          </p>
-
-          <div className="grid grid-cols-3 gap-2">
-
-            <button
-              type="button"
-              onClick={() =>
-                fillDemo(
-                  'donor@bloodconnect.com',
-                  'BloodConnect@123'
-                )
-              }
-              className="p-2 bg-slate-50 hover:bg-red-50 border border-slate-200 rounded-lg text-left text-[11px] space-y-0.5"
-            >
-              <p className="font-bold text-red-600">Donor</p>
-              <p className="text-slate-500 truncate">donor@...</p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                fillDemo(
-                  'organizer@bloodconnect.com',
-                  'BloodConnect@123'
-                )
-              }
-              className="p-2 bg-slate-50 hover:bg-amber-50 border border-slate-200 rounded-lg text-left text-[11px] space-y-0.5"
-            >
-              <p className="font-bold text-amber-600">Organizer</p>
-              <p className="text-slate-500 truncate">organizer@...</p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                fillDemo(
-                  'admin@bloodconnect.com',
-                  'BloodConnect@123'
-                )
-              }
-              className="p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-left text-[11px] space-y-0.5"
-            >
-              <p className="font-bold text-blue-600">Admin</p>
-              <p className="text-slate-500 truncate">admin@...</p>
-            </button>
-
-          </div>
-
-          <p className="text-[10px] text-slate-400 text-center">
-            Password for all demo accounts:{' '}
-            <code className="bg-slate-100 px-1 rounded">
-              BloodConnect@123
-            </code>
-          </p>
-
-        </div>
-
+                
       </div>
     </div>
   );
