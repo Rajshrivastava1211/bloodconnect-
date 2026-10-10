@@ -1,4 +1,5 @@
-﻿import React, { useState } from 'react';
+﻿import indianCities from '../data/indianCities';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Sidebar from '../components/Sidebar';
@@ -186,10 +187,11 @@ await api.post('/camps', campData);
                   onChange={handleChange}
                   className="w-full mt-1 border border-slate-300 rounded-lg p-2 text-sm bg-white"
                 >
-                  <option value="Mumbai">Mumbai</option>
-                  <option value="Pune">Pune</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Bangalore">Bangalore</option>
+                  {indianCities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
                 </select>
               </div>
 

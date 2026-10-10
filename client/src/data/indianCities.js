@@ -1,0 +1,46 @@
+
+const indianCities = [
+  'Agartala', 'Agra', 'Ahmedabad', 'Aizawl', 'Ajmer', 'Akola',
+  'Aligarh', 'Allahabad', 'Amravati', 'Amritsar', 'Anand',
+  'Arrah', 'Aurangabad', 'Ayodhya',
+  'Bengaluru', 'Bareilly', 'Bathinda', 'Belagavi', 'Bhagalpur',
+  'Bharuch', 'Bhavnagar', 'Bhilai', 'Bhiwandi', 'Bhopal',
+  'Bhubaneswar', 'Bhuj', 'Bikaner', 'Bilaspur', 'Bokaro',
+  'Chandigarh', 'Chennai', 'Coimbatore', 'Cuttack',
+  'Darbhanga', 'Dehradun', 'Delhi', 'Dhanbad', 'Dibrugarh',
+  'Durgapur', 'Erode',
+  'Faridabad', 'Firozabad',
+  'Gandhinagar', 'Gangtok', 'Gaya', 'Ghaziabad', 'Gorakhpur',
+  'Greater Noida', 'Guntur', 'Gurugram', 'Guwahati', 'Gwalior',
+  'Haldwani', 'Haridwar', 'Hisar', 'Hubballi', 'Hyderabad',
+  'Imphal', 'Indore', 'Itanagar',
+  'Jabalpur', 'Jaipur', 'Jalandhar', 'Jalgaon', 'Jammu',
+  'Jamnagar', 'Jamshedpur', 'Jhansi', 'Jodhpur', 'Junagadh',
+  'Kadapa', 'Kannur', 'Kanpur', 'Karimnagar', 'Karnal',
+  'Kochi', 'Kolhapur', 'Kolkata', 'Kollam', 'Kota', 'Kozhikode',
+  'Kurnool',
+  'Leh', 'Lucknow', 'Ludhiana',
+  'Madurai', 'Mangaluru', 'Mathura', 'Meerut', 'Moradabad',
+  'Mumbai', 'Muzaffarnagar', 'Muzaffarpur', 'Mysuru',
+  'Nagpur', 'Nanded', 'Nashik', 'Navi Mumbai', 'Nellore',
+  'Noida',
+  'Ongole',
+  'Palakkad', 'Panaji', 'Panipat', 'Patiala', 'Patna',
+  'Pimpri-Chinchwad', 'Pondicherry', 'Prayagraj', 'Puducherry',
+  'Pune', 'Puri',
+  'Raipur', 'Rajahmundry', 'Rajkot', 'Ranchi', 'Ratlam',
+  'Rourkela',
+  'Saharanpur', 'Salem', 'Sambalpur', 'Sangli', 'Satara',
+  'Shillong', 'Shimla', 'Siliguri', 'Silvassa', 'Solapur',
+  'Srinagar', 'Surat',
+  'Thane', 'Thanjavur', 'Thiruvananthapuram', 'Thrissur',
+  'Tiruchirappalli', 'Tirunelveli', 'Tirupati', 'Tumakuru',
+  'Udaipur', 'Ujjain', 'Ulhasnagar',
+  'Vadodara', 'Varanasi', 'Vasai-Virar', 'Vellore', 'Vijayawada',
+  'Visakhapatnam',
+  'Warangal'
+];
+
+export default [...new Set(indianCities)].sort((a, b) =>
+  a.localeCompare(b)
+);

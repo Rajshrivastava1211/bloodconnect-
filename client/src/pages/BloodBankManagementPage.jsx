@@ -1,3 +1,5 @@
+
+import indianCities from '../data/indianCities';
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Sidebar from '../components/Sidebar';
@@ -122,10 +124,11 @@ const BloodBankManagementPage = () => {
                     onChange={handleInputChange}
                     className="w-full mt-1 border border-slate-300 rounded-lg p-2 text-sm bg-white"
                   >
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Pune">Pune</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Bangalore">Bangalore</option>
+                    {indianCities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>

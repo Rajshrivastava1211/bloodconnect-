@@ -1,3 +1,4 @@
+import indianCities from '../data/indianCities';
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaFilter, FaCalendarAlt, FaCity } from 'react-icons/fa';
 import api from '../services/api';
@@ -70,10 +71,11 @@ const Camps = () => {
             className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-red-500 focus:border-red-500 bg-white"
           >
             <option value="">All Cities</option>
-            <option value="Mumbai">Mumbai</option>
-            <option value="Pune">Pune</option>
-            <option value="Delhi">Delhi</option>
-            <option value="Bangalore">Bangalore</option>
+            {indianCities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
           </select>
         </div>
 

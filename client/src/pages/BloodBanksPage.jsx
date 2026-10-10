@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import indianCities from '../data/indianCities';import React, { useState, useEffect } from 'react';
 import { FaHospital, FaSearch, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaExclamationTriangle } from 'react-icons/fa';
 import api from '../services/api';
 
@@ -67,10 +68,11 @@ const BloodBanksPage = () => {
           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
         >
           <option value="">All Cities</option>
-          <option value="Mumbai">Mumbai</option>
-          <option value="Pune">Pune</option>
-          <option value="Delhi">Delhi</option>
-          <option value="Bangalore">Bangalore</option>
+          {indianCities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
         </select>
       </div>
 
