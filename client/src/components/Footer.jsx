@@ -60,7 +60,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 space-y-2 md:space-y-0">
-          <p>&copy; {new Date().getFullYear()} BloodConnect Portal. Built for Semester 5 CEP Project.</p>
+          <p>&copy; {new Date().getFullYear()} BloodConnect Portal. </p>
           <p className="flex items-center space-x-1">
             <span>Made with</span>
             <FaHeart className="text-red-500 w-3 h-3 animate-pulse" />
