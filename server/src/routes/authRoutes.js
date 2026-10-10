@@ -22,10 +22,14 @@ const authLimiter = rateLimit({
 // REGISTRATION VALIDATION
 // =========================
 const registerValidation = [
-  body('name')
-    .trim()
-    .notEmpty()
-    .withMessage('Name is required.'),
+  
+body('name')
+  .trim()
+  .notEmpty()
+  .withMessage('Name is required.')
+  .matches(/^[\p{L}]+(?:\s+[\p{L}]+)*$/u)
+  .withMessage('Name must contain letters and spaces only.'),
+
 
   body('email')
     .trim()

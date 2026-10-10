@@ -48,48 +48,48 @@ const RegisterPage = () => {
   // =========================
   // DONOR INPUT HANDLER
   // =========================
-  const handleDonorChange = (e) => {
-    const { name, value } = e.target;
+  
+const handleDonorChange = (e) => {
+  const { name, value } = e.target;
 
-    if (name === 'phone') {
-      const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+  if (name === 'phone') {
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+    setDonorData((prev) => ({ ...prev, phone: digitsOnly }));
+    return;
+  }
 
-      setDonorData({
-        ...donorData,
-        phone: digitsOnly
-      });
+  if (name === 'name') {
+    const lettersOnly = value.replace(/[^\p{L}\s]/gu, '');
+    setDonorData((prev) => ({ ...prev, name: lettersOnly }));
+    return;
+  }
 
-      return;
-    }
+  setDonorData((prev) => ({ ...prev, [name]: value }));
+};
 
-    setDonorData({
-      ...donorData,
-      [name]: value
-    });
-  };
 
   // =========================
   // ORGANIZER INPUT HANDLER
   // =========================
-  const handleOrganizerChange = (e) => {
-    const { name, value } = e.target;
+  
+const handleOrganizerChange = (e) => {
+  const { name, value } = e.target;
 
-    if (name === 'phone') {
-      const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+  if (name === 'phone') {
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+    setOrganizerData((prev) => ({ ...prev, phone: digitsOnly }));
+    return;
+  }
 
-      setOrganizerData({
-        ...organizerData,
-        phone: digitsOnly
-      });
+  if (name === 'name') {
+    const lettersOnly = value.replace(/[^\p{L}\s]/gu, '');
+    setOrganizerData((prev) => ({ ...prev, name: lettersOnly }));
+    return;
+  }
 
-      return;
-    }
+  setOrganizerData((prev) => ({ ...prev, [name]: value }));
+};
 
-    setOrganizerData({
-      ...organizerData,
-      [name]: value
-    });
-  };
 
   // =========================
   // DONOR REGISTRATION
