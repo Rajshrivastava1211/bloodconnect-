@@ -24,7 +24,7 @@ const Home = () => {
     // Fetch public stats and open camps
     Promise.all([
       api.get('/stats/public').catch(() => ({ stats: null })),
-      api.get('/camps?status=open').catch(() => ({ camps: [] }))
+      api.get('/camps').catch(() => ({ camps: [] }))
     ]).then(([statsRes, campsRes]) => {
       if (statsRes && statsRes.stats) {
         setStats(statsRes.stats);
@@ -196,7 +196,7 @@ const Home = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex justify-between items-end">
           <div>
-            <h2 className="text-3xl font-extrabold text-slate-900">Open Donation Camps</h2>
+            <h2 className="text-3xl font-extrabold text-slate-900">Donation Camps</h2>
             <p className="text-sm text-slate-600 mt-1">Register now for upcoming blood drives near you.</p>
           </div>
           <Link to="/camps" className="text-red-600 hover:text-red-700 font-bold text-sm flex items-center space-x-1">
