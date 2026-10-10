@@ -1,6 +1,6 @@
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
 const { getDbWrapper } = require('../config/db');
 
 /**
@@ -9,42 +9,96 @@ const { getDbWrapper } = require('../config/db');
  */
 async function register(req, res) {
   try {
-    const { name, email, password, phone, blood_group, dob, gender, city, address } = req.body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      blood_group,
+      dob,
+      gender,
+      city,
+      address
+    } = req.body;
 
     const db = getDbWrapper();
 
-    // Check existing user
-    const existing = db.query('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
+    // Check whether the email already exists
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existing = db.query(
+      'SELECT id FROM users WHERE email = ?',
+      [normalizedEmail]
+    );
+
     if (existing.length > 0) {
-      return res.status(400).json({ success: false, message: 'An account with this email already exists.' });
+      return res.status(400).json({
+        success: false,
+        message: 'An account with this email already exists.'
+      });
     }
 
-    const password_hash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS || 10));
+    const password_hash = await bcrypt.hash(
+      password,
+      parseInt(process.env.BCRYPT_ROUNDS || 10, 10)
+    );
 
-    // Insert user
+    // Create user account
     const result = db.run(
       'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-      [name.trim(), email.toLowerCase().trim(), password_hash, 'donor']
+      [name.trim(), normalizedEmail, password_hash, 'donor']
     );
+
     const userId = result.lastInsertRowid;
 
-    // Insert donor profile
+    // Save donor profile, including the selected blood group
+    
+    // Save donor profile, including the selected blood group
     db.run(
-      'INSERT INTO donors (user_id, phone, blood_group, dob, gender, city, address) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [userId, phone || null, blood_group || null, dob || null, gender || null, city || null, address || null]
+      'INSERT INTO donors ' +
+      '(user_id, phone, blood_group, dob, gender, city, address) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [
+        userId,
+        phone || null,
+        blood_group || null,
+        dob || null,
+        gender || null,
+        city || null,
+        address || null
+      ]
     );
 
-    // Notify
+
+    // Create welcome notification
     db.run(
       'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-      [userId, 'Welcome to BloodConnect! Complete your profile and find a donation camp near you.', 'welcome']
+      [
+        userId,
+        'Welcome to BloodConnect! Complete your profile and find a donation camp near you.',
+        'welcome'
+      ]
     );
 
-    const token = jwt.sign({ id: userId, role: 'donor' }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-    });
+    const token = jwt.sign(
+      { id: userId, role: 'donor' },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
 
-    const user = db.query('SELECT id, name, email, role FROM users WHERE id = ?', [userId])[0];
+    // Return user details together with the saved donor blood group
+    const user = db.query(
+      `SELECT
+         u.id,
+         u.name,
+         u.email,
+         u.role,
+         d.blood_group
+       FROM users u
+       LEFT JOIN donors d ON d.user_id = u.id
+       WHERE u.id = ?`,
+      [userId]
+    )[0];
 
     return res.status(201).json({
       success: true,
@@ -54,7 +108,11 @@ async function register(req, res) {
     });
   } catch (err) {
     console.error('[Auth] Register error:', err);
-    return res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Registration failed. Please try again.'
+    });
   }
 }
 
@@ -66,38 +124,73 @@ async function login(req, res) {
     const { email, password } = req.body;
 
     const db = getDbWrapper();
+
+    // Include the donor blood group when fetching the account
     const users = db.query(
-      'SELECT id, name, email, role, password_hash, is_active FROM users WHERE email = ?',
+      `SELECT
+         u.id,
+         u.name,
+         u.email,
+         u.role,
+         u.password_hash,
+         u.is_active,
+         d.blood_group
+       FROM users u
+       LEFT JOIN donors d ON d.user_id = u.id
+       WHERE u.email = ?`,
       [email.toLowerCase().trim()]
     );
 
     if (!users.length) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password.'
+      });
     }
 
     const user = users[0];
+
     if (!user.is_active) {
-      return res.status(403).json({ success: false, message: 'Your account has been deactivated. Contact support.' });
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been deactivated. Contact support.'
+      });
     }
 
     const isValid = await bcrypt.compare(password, user.password_hash);
+
     if (!isValid) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password.'
+      });
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-    });
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
 
     return res.json({
       success: true,
       message: 'Login successful.',
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        blood_group: user.blood_group || null
+      }
     });
   } catch (err) {
     console.error('[Auth] Login error:', err);
-    return res.status(500).json({ success: false, message: 'Login failed. Please try again.' });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Login failed. Please try again.'
+    });
   }
 }
 
@@ -105,10 +198,43 @@ async function login(req, res) {
  * GET /api/auth/me
  */
 function getMe(req, res) {
-  const db = getDbWrapper();
-  const user = db.query('SELECT id, name, email, role, created_at FROM users WHERE id = ?', [req.user.id]);
-  if (!user.length) return res.status(404).json({ success: false, message: 'User not found.' });
-  return res.json({ success: true, user: user[0] });
+  try {
+    const db = getDbWrapper();
+
+    // Include blood group in the authenticated user's details
+    const users = db.query(
+      `SELECT
+         u.id,
+         u.name,
+         u.email,
+         u.role,
+         u.created_at,
+         d.blood_group
+       FROM users u
+       LEFT JOIN donors d ON d.user_id = u.id
+       WHERE u.id = ?`,
+      [req.user.id]
+    );
+
+    if (!users.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      user: users[0]
+    });
+  } catch (err) {
+    console.error('[Auth] GetMe error:', err);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to retrieve user details.'
+    });
+  }
 }
 
 /**
@@ -117,32 +243,54 @@ function getMe(req, res) {
  */
 async function registerOrganizer(req, res) {
   try {
-    const { name, email, password, phone, organization, city } = req.body;
-    const db = getDbWrapper();
+    const { name, email, password } = req.body;
 
-    const existing = db.query('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
+    const db = getDbWrapper();
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existing = db.query(
+      'SELECT id FROM users WHERE email = ?',
+      [normalizedEmail]
+    );
+
     if (existing.length > 0) {
-      return res.status(400).json({ success: false, message: 'An account with this email already exists.' });
+      return res.status(400).json({
+        success: false,
+        message: 'An account with this email already exists.'
+      });
     }
 
-    const password_hash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS || 10));
+    const password_hash = await bcrypt.hash(
+      password,
+      parseInt(process.env.BCRYPT_ROUNDS || 10, 10)
+    );
 
     const result = db.run(
       'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-      [name.trim(), email.toLowerCase().trim(), password_hash, 'organizer']
+      [name.trim(), normalizedEmail, password_hash, 'organizer']
     );
+
     const userId = result.lastInsertRowid;
 
     db.run(
       'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-      [userId, `Welcome to BloodConnect, ${name.trim()}! You can now create and manage blood donation camps.`, 'welcome']
+      [
+        userId,
+        `Welcome to BloodConnect, ${name.trim()}! You can now create and manage blood donation camps.`,
+        'welcome'
+      ]
     );
 
-    const token = jwt.sign({ id: userId, role: 'organizer' }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-    });
+    const token = jwt.sign(
+      { id: userId, role: 'organizer' },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
 
-    const user = db.query('SELECT id, name, email, role FROM users WHERE id = ?', [userId])[0];
+    const user = db.query(
+      'SELECT id, name, email, role FROM users WHERE id = ?',
+      [userId]
+    )[0];
 
     return res.status(201).json({
       success: true,
@@ -152,8 +300,17 @@ async function registerOrganizer(req, res) {
     });
   } catch (err) {
     console.error('[Auth] RegisterOrganizer error:', err);
-    return res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Registration failed. Please try again.'
+    });
   }
 }
 
-module.exports = { register, login, getMe, registerOrganizer };
+module.exports = {
+  register,
+  login,
+  getMe,
+  registerOrganizer
+};
